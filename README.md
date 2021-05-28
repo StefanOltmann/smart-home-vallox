@@ -1,7 +1,8 @@
 # Stefans Smart Home Vallox Client
 
 [![CI](https://github.com/StefanOltmann/smart-home-vallox/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/StefanOltmann/smart-home-vallox/actions/workflows/ci.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smart-home-server&metric=alert_status)](https://sonarcloud.io/dashboard?id=smart-home-vallox)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smart-home-vallox&metric=alert_status)](https://sonarcloud.io/dashboard?id=smart-home-vallox)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smart-home-vallox&metric=coverage)](https://sonarcloud.io/dashboard?id=smart-home-vallox)
 [![EPL-2.0](https://img.shields.io/badge/license-EPL%202-green.svg)](https://opensource.org/licenses/EPL-2.0)
 
 This is a client that controls Vallox MV ventilation units.
