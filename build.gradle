@@ -1,0 +1,98 @@
+buildscript {
+    ext {
+        // Dependency versions
+        // Must be defined here instead of "gradle.properties" because of
+        // https://github.com/dependabot/dependabot-core/issues/1618
+        detektVersion = '1.17.1'
+        gitVersioningVersion = '4.2.0'
+        kotlinVersion = '1.5.10'
+        slf4jVersion = '1.7.30'
+        sonarqubeVersion = '3.2.0'
+        websocketJettyClientVersion = '11.0.3'
+    }
+}
+
+plugins {
+    id 'java'
+    id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
+    id "me.qoomon.git-versioning" version "$gitVersioningVersion"
+    id "io.gitlab.arturbosch.detekt" version "$detektVersion"
+    id "org.sonarqube" version "$sonarqubeVersion"
+}
+
+description "Stefans Smart Vallox Client"
+group = "de.stefan_oltmann.smarthome.vallox"
+version "0.0.0"
+
+gitVersioning.apply {
+    branch {
+        pattern = 'master'
+        versionFormat = '${commit.short}'
+    }
+    tag {
+        pattern = 'v(?<tagVersion>[0-9].*)'
+        versionFormat = '${tagVersion}'
+    }
+}
+
+detekt {
+    allRules = true
+    config = files("$projectDir/detekt.yml")
+
+    // Don't break the build. Just report.
+    ignoreFailures = true
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "smart-home-vallox"
+        property "sonar.projectName", "Stefans Smart Home Vallox Client"
+        property "sonar.organization", "stefanoltmann"
+        property "sonar.host.url", "https://sonarcloud.io"
+        // Include Detekt issues
+        property "sonar.kotlin.detekt.reportPaths", "build/reports/detekt/detekt.xml"
+    }
+}
+
+// SonarQube should always contain Detekt issues
+tasks.findByPath(':sonarqube').dependsOn('detekt')
+
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+    mavenCentral()
+    jcenter() // needed by Detekt
+}
+
+dependencies {
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // WebSocket client
+    implementation "org.eclipse.jetty.websocket:websocket-jetty-client:$websocketJettyClientVersion"
+
+    // Logging
+    implementation "org.slf4j:slf4j-simple:$slf4jVersion"
+    implementation("org.slf4j:slf4j-api") {
+        version {
+            // Prevent upgrades here because of compatibility issues
+            strictly slf4jVersion
+        }
+    }
+}
