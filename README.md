@@ -9,8 +9,9 @@ This is a client that controls Vallox MV ventilation units.
 
 ## Motivation
 
-I own a **Vallox ValloPlus 270 MV** and want to connect it to my own [smart home system](https://github.com/StefanOltmann/smart-home-server).
-For this I needed a simple and clean Java/Kotlin client.
+I own a **Vallox ValloPlus 270 MV** and wanted to connect it to my own [smart home system](https://github.com/StefanOltmann/smart-home-server).
+
+For this use case I needed a simple and clean Java/Kotlin client.
 
 ## Credits
 
