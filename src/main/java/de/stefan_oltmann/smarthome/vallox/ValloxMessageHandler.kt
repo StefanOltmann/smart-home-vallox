@@ -25,18 +25,8 @@ object ValloxMessageHandler {
     private var fireplaceTime = 0
     private var fireplaceTimerEnabled = false
 
-    fun generateReadRequestBytes(): ByteBuffer = ByteBuffer.wrap(
-        byteArrayOf(
-            3,
-            0,
-            ValloxDataMode.READ_TABLES.value.toByte(),
-            0,
-            0,
-            0,
-            ValloxDataMode.WRITE_DATA.value.toByte(),
-            0
-        )
-    )
+    fun generateReadRequestBytes(): ByteBuffer =
+        ByteBuffer.wrap(byteArrayOf(3, 0, -10, 0, 0, 0, -7, 0))
 
     fun generateWriteRequestBytesSwitchToProfile(profile: ValloxProfile): ByteBuffer {
 
