@@ -55,7 +55,7 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         )
     }
 
-    override fun switchProfile(profile: ValloxProfile) {
+    override fun switchProfile(profile: Profile) {
         sendBytesToService(
             requestBytes = messageHandler.generateWriteRequestBytesSwitchToProfile(profile),
             dataMode = ValloxDataMode.WRITE_DATA
@@ -82,7 +82,7 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         )
     }
 
-    override fun setFanSpeed(profile: ValloxProfile, fanSpeed: Int) {
+    override fun setFanSpeed(profile: Profile, fanSpeed: Int) {
 
         require(fanSpeed in 0..100)
 
@@ -112,7 +112,7 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         )
     }
 
-    override fun setTargetTemperature(profile: ValloxProfile, targetTemperature: Int) {
+    override fun setTargetTemperature(profile: Profile, targetTemperature: Int) {
 
         require(targetTemperature in 5..25)
 

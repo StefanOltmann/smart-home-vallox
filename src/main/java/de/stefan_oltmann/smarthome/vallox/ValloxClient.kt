@@ -20,9 +20,9 @@ interface ValloxClient {
 
     fun turnOff()
 
-    fun switchProfile(profile: ValloxProfile)
+    fun switchProfile(profile: Profile)
 
-    fun setFanSpeed(profile: ValloxProfile, fanSpeed: Int)
+    fun setFanSpeed(profile: Profile, fanSpeed: Int)
 
     fun setExtractFanBalanceBase(fanSpeed: Int)
 
@@ -32,7 +32,7 @@ interface ValloxClient {
 
     fun setFireplaceSupplyFanSpeed(fanSpeed: Int)
 
-    fun setTargetTemperature(profile: ValloxProfile, targetTemperature: Int)
+    fun setTargetTemperature(profile: Profile, targetTemperature: Int)
 
     fun setBytesBoostTime(boostTimeInMinutes: Int)
 

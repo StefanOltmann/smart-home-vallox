@@ -5,7 +5,8 @@ buildscript {
         // https://github.com/dependabot/dependabot-core/issues/1618
         detektVersion = '1.17.1'
         gitVersioningVersion = '4.2.0'
-        kotlinVersion = '1.5.10'
+        junitVersion = '5.7.2'
+        kotlinVersion = '1.4.32'
         slf4jVersion = '1.7.30'
         sonarqubeVersion = '3.2.0'
         websocketJettyClientVersion = '11.0.3'
@@ -13,7 +14,8 @@ buildscript {
 }
 
 plugins {
-    id 'java'
+    id "java"
+    id "jacoco"
     id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
     id "me.qoomon.git-versioning" version "$gitVersioningVersion"
     id "io.gitlab.arturbosch.detekt" version "$detektVersion"
@@ -32,6 +34,24 @@ gitVersioning.apply {
     tag {
         pattern = 'v(?<tagVersion>[0-9].*)'
         versionFormat = '${tagVersion}'
+    }
+}
+
+test {
+
+    useJUnitPlatform()
+
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+
+    dependsOn test // tests are required to run before generating the report
+
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled false
     }
 }
 
@@ -64,10 +84,15 @@ compileKotlin {
         jvmTarget = "1.8"
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
 
 repositories {
@@ -95,4 +120,7 @@ dependencies {
             strictly slf4jVersion
         }
     }
+
+    // Unit Tests
+    testImplementation "org.junit.jupiter:junit-jupiter:$junitVersion"
 }

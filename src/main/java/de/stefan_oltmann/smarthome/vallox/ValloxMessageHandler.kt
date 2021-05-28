@@ -28,11 +28,11 @@ object ValloxMessageHandler {
     fun generateReadRequestBytes(): ByteBuffer =
         ByteBuffer.wrap(byteArrayOf(3, 0, -10, 0, 0, 0, -7, 0))
 
-    fun generateWriteRequestBytesSwitchToProfile(profile: ValloxProfile): ByteBuffer {
+    fun generateWriteRequestBytesSwitchToProfile(profile: Profile): ByteBuffer {
 
         when (profile) {
 
-            ValloxProfile.AT_HOME ->
+            Profile.AT_HOME ->
                 return generateWriteRequestBytes(
                     mapOf(
                         4609 to 0,
@@ -41,7 +41,7 @@ object ValloxMessageHandler {
                     )
                 )
 
-            ValloxProfile.AWAY ->
+            Profile.AWAY ->
                 return generateWriteRequestBytes(
                     mapOf(
                         4609 to 1,
@@ -50,7 +50,7 @@ object ValloxMessageHandler {
                     )
                 )
 
-            ValloxProfile.BOOST ->
+            Profile.BOOST ->
                 return generateWriteRequestBytes(
                     mapOf(
                         4612 to if (boostTime > 0) boostTime else 30,
@@ -58,7 +58,7 @@ object ValloxMessageHandler {
                     )
                 )
 
-            ValloxProfile.FIREPLACE ->
+            Profile.FIREPLACE ->
                 return generateWriteRequestBytes(
                     mapOf(
                         4612 to 0,
@@ -71,12 +71,12 @@ object ValloxMessageHandler {
     fun generateWriteRequestBytesOnOff(updateState: Int) =
         generateWriteRequestBytes(4610, updateState)
 
-    fun generateWriteRequestBytesFanSpeed(profile: ValloxProfile, fanSpeed: Int) =
+    fun generateWriteRequestBytesFanSpeed(profile: Profile, fanSpeed: Int) =
         when (profile) {
-            ValloxProfile.AT_HOME -> generateWriteRequestBytes(20507, fanSpeed)
-            ValloxProfile.AWAY -> generateWriteRequestBytes(20501, fanSpeed)
-            ValloxProfile.BOOST -> generateWriteRequestBytes(20513, fanSpeed)
-            ValloxProfile.FIREPLACE -> throw IllegalArgumentException("Fireplace has no unique fan speed setting")
+            Profile.AT_HOME -> generateWriteRequestBytes(20507, fanSpeed)
+            Profile.AWAY -> generateWriteRequestBytes(20501, fanSpeed)
+            Profile.BOOST -> generateWriteRequestBytes(20513, fanSpeed)
+            Profile.FIREPLACE -> throw IllegalArgumentException("Fireplace has no unique fan speed setting")
         }
 
     fun generateWriteRequestBytesExtractFanBalanceBase(fanSpeed: Int) =
@@ -91,12 +91,12 @@ object ValloxMessageHandler {
     fun generateWriteRequestBytesFireplaceSupplyFanSpeed(fanSpeed: Int) =
         generateWriteRequestBytes(20488, fanSpeed)
 
-    fun generateWriteRequestBytesTargetTemperature(profile: ValloxProfile, targetTemperature: Int) =
+    fun generateWriteRequestBytesTargetTemperature(profile: Profile, targetTemperature: Int) =
         when (profile) {
-            ValloxProfile.AT_HOME -> generateWriteRequestBytes(20508, targetTemperature)
-            ValloxProfile.AWAY -> generateWriteRequestBytes(20502, targetTemperature)
-            ValloxProfile.BOOST -> generateWriteRequestBytes(20514, targetTemperature)
-            ValloxProfile.FIREPLACE -> throw IllegalArgumentException("Fireplace does not have this setting")
+            Profile.AT_HOME -> generateWriteRequestBytes(20508, targetTemperature)
+            Profile.AWAY -> generateWriteRequestBytes(20502, targetTemperature)
+            Profile.BOOST -> generateWriteRequestBytes(20514, targetTemperature)
+            Profile.FIREPLACE -> throw IllegalArgumentException("Fireplace does not have this setting")
         }
 
     fun generateWriteRequestBytesBoostTime(boostTime: Int): ByteBuffer {

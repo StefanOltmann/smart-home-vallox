@@ -10,7 +10,7 @@
  */
 package de.stefan_oltmann.smarthome.vallox
 
-enum class ValloxProfile {
+enum class Profile {
 
     AT_HOME,
     AWAY,
