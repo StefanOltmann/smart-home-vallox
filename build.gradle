@@ -9,7 +9,7 @@ buildscript {
         kotlinVersion = '1.5.10'
         slf4jVersion = '1.7.30'
         sonarqubeVersion = '3.2.0'
-        websocketJettyClientVersion = '11.0.3'
+        websocketJettyClientVersion = '11.0.4'
     }
 }
 
