@@ -6,7 +6,7 @@ buildscript {
         detektVersion = '1.17.1'
         gitVersioningVersion = '4.2.0'
         junitVersion = '5.7.2'
-        kotlinVersion = '1.5.10'
+        kotlinVersion = '1.6.10'
         slf4jVersion = '1.7.30'
         sonarqubeVersion = '3.2.0'
         websocketJettyClientVersion = '11.0.4'
