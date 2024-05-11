@@ -77,7 +77,17 @@ data class ValloxStatus(
 ) {
 
     fun toStringPretty() = """
-        # Vallox Status
+        ###
+        ### Vallox status
+        ###
+
         Profile: $profile
+        Fan Speed: $fanSpeedPercentage %
+
+        Temp inside: $tempInside °C
+        Temp outside: $tempOutside °C
+        Temp incoming: $tempIncoming °C (before heating: $tempIncomingBeforeHeating °C)
+        Temp exhausting: $tempExhaust °C
+        Humidity: $humidity %
     """.trimIndent()
 }
