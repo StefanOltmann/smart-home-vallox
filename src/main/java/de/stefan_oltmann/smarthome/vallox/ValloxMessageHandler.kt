@@ -10,6 +10,7 @@
  */
 package de.stefan_oltmann.smarthome.vallox
 
+import io.ktor.util.moveToByteArray
 import java.lang.IllegalArgumentException
 import java.nio.ByteBuffer
 
@@ -25,10 +26,10 @@ object ValloxMessageHandler {
     private var fireplaceTime = 0
     private var fireplaceTimerEnabled = false
 
-    fun generateReadRequestBytes(): ByteBuffer =
-        ByteBuffer.wrap(byteArrayOf(3, 0, -10, 0, 0, 0, -7, 0))
+    fun generateReadRequestBytes(): ByteArray =
+        byteArrayOf(3, 0, -10, 0, 0, 0, -7, 0)
 
-    fun generateWriteRequestBytesSwitchToProfile(profile: Profile): ByteBuffer {
+    fun generateWriteRequestBytesSwitchToProfile(profile: Profile): ByteArray {
 
         when (profile) {
 
@@ -99,22 +100,22 @@ object ValloxMessageHandler {
             Profile.FIREPLACE -> throw IllegalArgumentException("Fireplace does not have this setting")
         }
 
-    fun generateWriteRequestBytesBoostTime(boostTime: Int): ByteBuffer {
+    fun generateWriteRequestBytesBoostTime(boostTime: Int): ByteArray {
         ValloxMessageHandler.boostTime = boostTime
         return generateWriteRequestBytes(20544, boostTime)
     }
 
-    fun generateWriteRequestBytesBoostTimerEnabled(enabled: Boolean): ByteBuffer {
+    fun generateWriteRequestBytesBoostTimerEnabled(enabled: Boolean): ByteArray {
         boostTimerEnabled = enabled
         return generateWriteRequestBytes(21766, if (enabled) 1 else 0)
     }
 
-    fun generateWriteRequestBytesFireplaceTime(fireplaceTime: Int): ByteBuffer {
+    fun generateWriteRequestBytesFireplaceTime(fireplaceTime: Int): ByteArray {
         ValloxMessageHandler.fireplaceTime = fireplaceTime
         return generateWriteRequestBytes(20545, fireplaceTime)
     }
 
-    fun generateWriteRequestBytesFireplaceTimerEnabled(enabled: Boolean): ByteBuffer {
+    fun generateWriteRequestBytesFireplaceTimerEnabled(enabled: Boolean): ByteArray {
         fireplaceTimerEnabled = enabled
         return generateWriteRequestBytes(21767, if (enabled) 1 else 0)
     }
@@ -123,39 +124,39 @@ object ValloxMessageHandler {
         generateWriteRequestBytes(4615, if (enabled) 1 else 0)
 
     /**
-     * Method to generate ByteBuffer request to be sent to vallox online websocket
+     * Method to generate ByteArray request to be sent to vallox online websocket
      * to request or set data
      */
-    private fun generateWriteRequestBytes(parameters: Map<Int, Int>): ByteBuffer {
+    private fun generateWriteRequestBytes(parameters: Map<Int, Int>): ByteArray {
 
         /* Parameters (key + value) + Mode + Checksum */
         val numberParameters = parameters.size * 2 + 2
         val capacity = (numberParameters + 1) * 2
 
         val byteBuffer =
-            ByteBuffer.allocate(capacity).put(convertIntegerIntoByteBuffer(numberParameters))
+            ByteBuffer.allocate(capacity).put(convertIntegerIntoByteArray(numberParameters))
 
-        byteBuffer.put(convertIntegerIntoByteBuffer(ValloxDataMode.WRITE_DATA.value))
+        byteBuffer.put(convertIntegerIntoByteArray(ValloxDataMode.WRITE_DATA.value))
 
         var checksum = numberParameters + ValloxDataMode.WRITE_DATA.value
 
         for ((key, value) in parameters) {
-            byteBuffer.put(convertIntegerIntoByteBuffer(key))
-            byteBuffer.put(convertIntegerIntoByteBuffer(value))
+            byteBuffer.put(convertIntegerIntoByteArray(key))
+            byteBuffer.put(convertIntegerIntoByteArray(value))
             checksum += key + value
         }
 
-        byteBuffer.put(convertIntegerIntoByteBuffer(checksum))
+        byteBuffer.put(convertIntegerIntoByteArray(checksum))
         byteBuffer.position(0)
 
-        return byteBuffer
+        return byteBuffer.moveToByteArray()
     }
 
     private fun generateWriteRequestBytes(key: Int, value: Int) =
         generateWriteRequestBytes(mapOf(key to value))
 
-    private fun convertIntegerIntoByteBuffer(integer: Int) =
-        ByteBuffer.wrap(byteArrayOf((integer and 0xff).toByte(), (integer shr 8 and 0xff).toByte()))
+    private fun convertIntegerIntoByteArray(integer: Int) =
+        byteArrayOf((integer and 0xff).toByte(), (integer shr 8 and 0xff).toByte())
 
     fun readMessage(dataMode: ValloxDataMode, bytes: ByteArray): ValloxStatus? {
 

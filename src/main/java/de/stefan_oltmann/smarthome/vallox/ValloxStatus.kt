@@ -74,4 +74,10 @@ data class ValloxStatus(
     /* Weekly Timer */
     val weeklyTimerEnabled: Boolean
 
-)
+) {
+
+    fun toStringPretty() = """
+        # Vallox Status
+        Profile: $profile
+    """.trimIndent()
+}

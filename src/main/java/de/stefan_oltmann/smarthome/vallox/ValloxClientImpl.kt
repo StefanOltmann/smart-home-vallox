@@ -197,7 +197,7 @@ class ValloxClientImpl(
     }
 
     private suspend fun sendBytesToService(
-        requestBytes: ByteBuffer,
+        requestBytes: ByteArray,
         dataMode: ValloxDataMode
     ): ValloxStatus? {
 
@@ -210,7 +210,7 @@ class ValloxClientImpl(
             path = "/"
         ) {
 
-            send(requestBytes.moveToByteArray())
+            send(requestBytes)
 
             val responseBytes = incoming.receive().data
 

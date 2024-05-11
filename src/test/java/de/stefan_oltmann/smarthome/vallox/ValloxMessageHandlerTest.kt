@@ -17,7 +17,7 @@ import java.util.Arrays
  */
 class ValloxMessageHandlerTest {
 
-    private fun ByteBuffer.asByteArrayString() = Arrays.toString(this.array())
+    private fun ByteArray.asByteArrayString() = toList().toString()
 
     @Test
     fun testGenerateReadRequestBytes() {
@@ -370,8 +370,6 @@ class ValloxMessageHandlerTest {
 
         assertNotNull(valloxStatus)
         checkNotNull(valloxStatus)
-
-        println(valloxStatus)
 
         /* Profile */
         assertEquals(0, valloxStatus.profile)
