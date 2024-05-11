@@ -15,7 +15,6 @@ buildscript {
 
 plugins {
     id "java"
-    id "jacoco"
     id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
     id "me.qoomon.git-versioning" version "$gitVersioningVersion"
     id "io.gitlab.arturbosch.detekt" version "$detektVersion"
@@ -40,19 +39,6 @@ gitVersioning.apply {
 test {
 
     useJUnitPlatform()
-
-    finalizedBy jacocoTestReport // report is always generated after tests run
-}
-
-jacocoTestReport {
-
-    dependsOn test // tests are required to run before generating the report
-
-    reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled false
-    }
 }
 
 detekt {
@@ -78,18 +64,6 @@ sonarqube {
 tasks.findByPath(':sonarqube').dependsOn('detekt')
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

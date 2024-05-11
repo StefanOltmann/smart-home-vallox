@@ -10,13 +10,8 @@
  */
 package de.stefan_oltmann.smarthome.vallox
 
-import io.ktor.util.moveToByteArray
 import java.lang.IllegalArgumentException
-import java.nio.ByteBuffer
 
-/**
- * This class is working with the ByteBuffer
- */
 object ValloxMessageHandler {
 
     private const val ACK_FLAG = 245
@@ -127,36 +122,42 @@ object ValloxMessageHandler {
      * Method to generate ByteArray request to be sent to vallox online websocket
      * to request or set data
      */
-    private fun generateWriteRequestBytes(parameters: Map<Int, Int>): ByteArray {
+    private fun generateWriteRequestBytes(
+        parameters: Map<Int, Int>
+    ): ByteArray {
 
-        /* Parameters (key + value) + Mode + Checksum */
         val numberParameters = parameters.size * 2 + 2
-        val capacity = (numberParameters + 1) * 2
 
-        val byteBuffer =
-            ByteBuffer.allocate(capacity).put(convertIntegerIntoByteArray(numberParameters))
+        val byteList = mutableListOf<Byte>()
 
-        byteBuffer.put(convertIntegerIntoByteArray(ValloxDataMode.WRITE_DATA.value))
+        writeIntToList(byteList, numberParameters)
+
+        writeIntToList(byteList, ValloxDataMode.WRITE_DATA.value)
 
         var checksum = numberParameters + ValloxDataMode.WRITE_DATA.value
 
-        for ((key, value) in parameters) {
-            byteBuffer.put(convertIntegerIntoByteArray(key))
-            byteBuffer.put(convertIntegerIntoByteArray(value))
+        // Write each parameter key-value pair and update checksum
+        parameters.forEach { (key, value) ->
+
+            writeIntToList(byteList, key)
+
+            writeIntToList(byteList, value)
+
             checksum += key + value
         }
 
-        byteBuffer.put(convertIntegerIntoByteArray(checksum))
-        byteBuffer.position(0)
+        writeIntToList(byteList, checksum)
 
-        return byteBuffer.moveToByteArray()
+        return byteList.toByteArray()
+    }
+
+    private fun writeIntToList(byteList: MutableList<Byte>, value: Int) {
+        byteList.add((value and 0xFF).toByte())
+        byteList.add(((value shr 8) and 0xFF).toByte())
     }
 
     private fun generateWriteRequestBytes(key: Int, value: Int) =
         generateWriteRequestBytes(mapOf(key to value))
-
-    private fun convertIntegerIntoByteArray(integer: Int) =
-        byteArrayOf((integer and 0xff).toByte(), (integer shr 8 and 0xff).toByte())
 
     fun readMessage(dataMode: ValloxDataMode, bytes: ByteArray): ValloxStatus? {
 
