@@ -10,13 +10,15 @@
  */
 package de.stefan_oltmann.smarthome.vallox
 
-import org.eclipse.jetty.websocket.api.Session
-import org.eclipse.jetty.websocket.client.ClientUpgradeRequest
-import org.eclipse.jetty.websocket.client.WebSocketClient
-import java.net.URI
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.http.HttpMethod
+import io.ktor.util.moveToByteArray
+import io.ktor.websocket.send
+import kotlinx.coroutines.runBlocking
 import java.nio.ByteBuffer
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
 
 /**
  * The [ValloxClientImpl] is responsible for socket communication with the vallox ventilation unit
@@ -24,40 +26,44 @@ import java.util.concurrent.TimeUnit
  * @author Björn Brings - Initial contribution
  * @author Stefan Oltmann - Refactorings and Kotlin conversion
  */
-class ValloxClientImpl(private val uri: URI) : ValloxClient {
+class ValloxClientImpl(
+    val host: String
+) : ValloxClient {
 
-    private val webSocketClient = WebSocketClient()
+    private val httpClient = HttpClient {
 
-    private val messageHandler = ValloxMessageHandler
+        install(HttpTimeout) {
+            this.requestTimeoutMillis = 5000
+        }
 
-    init {
-        webSocketClient.start()
+        install(WebSockets)
     }
 
     override fun readStatus(): ValloxStatus {
 
-        val requestBytes = messageHandler.generateReadRequestBytes()
-
-        return sendBytesToService(requestBytes, ValloxDataMode.READ_TABLES)!!
+        return sendBytesToService(
+            ValloxMessageHandler.generateReadRequestBytes(),
+            ValloxDataMode.READ_TABLES
+        )!!
     }
 
     override fun turnOn() {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesOnOff(1),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesOnOff(1),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
 
     override fun turnOff() {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesOnOff(0),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesOnOff(0),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
 
     override fun switchProfile(profile: Profile) {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesSwitchToProfile(profile),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesSwitchToProfile(profile),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
@@ -67,7 +73,9 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         require(fanSpeed in 0..100)
 
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesExtractFanBalanceBase(fanSpeed),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesExtractFanBalanceBase(
+                fanSpeed
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
@@ -77,7 +85,9 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         require(fanSpeed in 0..100)
 
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesSupplyFanBalanceBase(fanSpeed),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesSupplyFanBalanceBase(
+                fanSpeed
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
@@ -87,7 +97,10 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         require(fanSpeed in 0..100)
 
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesFanSpeed(profile, fanSpeed),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesFanSpeed(
+                profile,
+                fanSpeed
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
@@ -97,7 +110,9 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         require(fanSpeed in 0..100)
 
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesFireplaceExtractFanSpeed(fanSpeed),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesFireplaceExtractFanSpeed(
+                fanSpeed
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
@@ -107,7 +122,9 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         require(fanSpeed in 0..100)
 
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesFireplaceSupplyFanSpeed(fanSpeed),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesFireplaceSupplyFanSpeed(
+                fanSpeed
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
@@ -117,7 +134,7 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
         require(targetTemperature in 5..25)
 
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesTargetTemperature(
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesTargetTemperature(
                 profile,
                 targetTemperature
             ),
@@ -127,35 +144,41 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
 
     override fun setBytesBoostTime(boostTimeInMinutes: Int) {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesBoostTime(boostTimeInMinutes),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesBoostTime(
+                boostTimeInMinutes
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
 
     override fun setBoostTimerEnabled(enabled: Boolean) {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesBoostTimerEnabled(enabled),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesBoostTimerEnabled(enabled),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
 
     override fun setFireplaceTime(fireplaceTimeInMinutes: Int) {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesFireplaceTime(fireplaceTimeInMinutes),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesFireplaceTime(
+                fireplaceTimeInMinutes
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
 
     override fun setFireplaceTimerEnabled(enabled: Boolean) {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesFireplaceTimerEnabled(enabled),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesFireplaceTimerEnabled(
+                enabled
+            ),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
 
     override fun setWeeklyTimerEnabled(enabled: Boolean) {
         sendBytesToService(
-            requestBytes = messageHandler.generateWriteRequestBytesWeeklyTimerEnabled(enabled),
+            requestBytes = ValloxMessageHandler.generateWriteRequestBytesWeeklyTimerEnabled(enabled),
             dataMode = ValloxDataMode.WRITE_DATA
         )
     }
@@ -163,36 +186,24 @@ class ValloxClientImpl(private val uri: URI) : ValloxClient {
     private fun sendBytesToService(
         requestBytes: ByteBuffer,
         dataMode: ValloxDataMode
-    ): ValloxStatus? {
+    ): ValloxStatus? = runBlocking {
 
-        var sessionFuture: Future<Session>? = null
+        var status: ValloxStatus? = null
 
-        var valloxStatus: ValloxStatus? = null
+        httpClient.webSocket(
+            method = HttpMethod.Get,
+            host = host,
+            port = 80,
+            path = "/"
+        ) {
 
-        try {
+            send(requestBytes.moveToByteArray())
 
-            val socket = ValloxWebSocketListener { bytes ->
-                valloxStatus = messageHandler.readMessage(dataMode, bytes)
-            }
+            val responseBytes = incoming.receive().data
 
-            val request = ClientUpgradeRequest()
-
-            sessionFuture = webSocketClient.connect(socket, uri, request)
-
-            /* Blocked wait until connection is established. */
-            val session = sessionFuture.get()
-
-            session.remote.sendBytes(requestBytes)
-
-            /* Wait that the request has finished. */
-            socket.awaitClose(2, TimeUnit.SECONDS)
-
-            return valloxStatus
-
-        } finally {
-
-            if (sessionFuture != null && !sessionFuture.isDone)
-                sessionFuture.cancel(true)
+            status = ValloxMessageHandler.readMessage(dataMode, responseBytes)
         }
+
+        return@runBlocking status
     }
 }

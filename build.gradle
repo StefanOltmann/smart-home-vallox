@@ -9,7 +9,7 @@ buildscript {
         kotlinVersion = '1.9.24'
         slf4jVersion = '1.7.30'
         sonarqubeVersion = '3.2.0'
-        websocketJettyClientVersion = '11.0.4'
+        ktorVersion = '2.3.11'
     }
 }
 
@@ -110,7 +110,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
     // WebSocket client
-    implementation "org.eclipse.jetty.websocket:websocket-jetty-client:$websocketJettyClientVersion"
+    implementation "io.ktor:ktor-client-core:$ktorVersion"
+    implementation "io.ktor:ktor-client-cio:$ktorVersion"
+    implementation "io.ktor:ktor-client-websockets:$ktorVersion"
 
     // Logging
     implementation "org.slf4j:slf4j-simple:$slf4jVersion"
