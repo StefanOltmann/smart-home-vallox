@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2010-2021 Contributors to the openHAB project
- * Copyright (c) 2021 Stefan Oltmann
+ * Copyright (c) 2024 Stefan Oltmann
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -10,7 +10,9 @@
  */
 package de.stefan_oltmann.smarthome.vallox;
 
-enum class ValloxDataMode(val value: Int) {
+enum class ValloxDataMode(
+    val value: Int
+) {
 
     READ_TABLES(246),
     WRITE_DATA(249),

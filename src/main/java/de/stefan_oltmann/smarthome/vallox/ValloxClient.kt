@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2010-2021 Contributors to the openHAB project
- * Copyright (c) 2021 Stefan Oltmann
+ * Copyright (c) 2024 Stefan Oltmann
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
@@ -10,43 +10,36 @@
  */
 package de.stefan_oltmann.smarthome.vallox
 
-import java.net.URI
-
 interface ValloxClient {
 
-    fun readStatus(): ValloxStatus
+    suspend fun readStatus(): ValloxStatus?
 
-    fun turnOn()
+    suspend fun turnOn()
 
-    fun turnOff()
+    suspend fun turnOff()
 
-    fun switchProfile(profile: Profile)
+    suspend fun switchProfile(profile: Profile)
 
-    fun setFanSpeed(profile: Profile, fanSpeed: Int)
+    suspend fun setFanSpeed(profile: Profile, fanSpeed: Int)
 
-    fun setExtractFanBalanceBase(fanSpeed: Int)
+    suspend fun setExtractFanBalanceBase(fanSpeed: Int)
 
-    fun setSupplyFanBalanceBase(fanSpeed: Int)
+    suspend fun setSupplyFanBalanceBase(fanSpeed: Int)
 
-    fun setFireplaceExtractFanSpeed(fanSpeed: Int)
+    suspend fun setFireplaceExtractFanSpeed(fanSpeed: Int)
 
-    fun setFireplaceSupplyFanSpeed(fanSpeed: Int)
+    suspend fun setFireplaceSupplyFanSpeed(fanSpeed: Int)
 
-    fun setTargetTemperature(profile: Profile, targetTemperature: Int)
+    suspend fun setTargetTemperature(profile: Profile, targetTemperature: Int)
 
-    fun setBytesBoostTime(boostTimeInMinutes: Int)
+    suspend fun setBytesBoostTime(boostTimeInMinutes: Int)
 
-    fun setBoostTimerEnabled(enabled: Boolean)
+    suspend fun setBoostTimerEnabled(enabled: Boolean)
 
-    fun setFireplaceTime(fireplaceTimeInMinutes: Int)
+    suspend fun setFireplaceTime(fireplaceTimeInMinutes: Int)
 
-    fun setFireplaceTimerEnabled(enabled: Boolean)
+    suspend fun setFireplaceTimerEnabled(enabled: Boolean)
 
-    fun setWeeklyTimerEnabled(enabled: Boolean)
+    suspend fun setWeeklyTimerEnabled(enabled: Boolean)
 
-    companion object {
-
-        fun createURI(ip: String) = URI("ws://$ip:80")
-
-    }
 }
