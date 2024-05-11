@@ -76,7 +76,7 @@ data class ValloxStatus(
 
 ) {
 
-    fun toStringPretty() = """
+    fun toPrettyString() = """
         ###
         ### Vallox status
         ###
